@@ -1,0 +1,38 @@
+specVersion: 0.0.1
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: GTC
+    network: mainnet
+    source:
+      address: "0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F"
+      abi: GTC
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.2
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - DelegateChanged
+        - DelegateVotesChanged
+        - GTCDistChanged
+        - MinterChanged
+        - Transfer
+      abis:
+        - name: GTC
+          file: ./abis/GTC.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged
+        - event: GTCDistChanged(address,address)
+          handler: handleGTCDistChanged
+        - event: MinterChanged(address,address)
+          handler: handleMinterChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mapping.ts
