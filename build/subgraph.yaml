@@ -1,0 +1,29 @@
+specVersion: 0.0.2
+description: Gitcoindelegates
+repository: https://github.com/fishbiscuit/GTC
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: GTC
+    network: mainnet
+    source:
+      address: "0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F"
+      abi: GTC
+      startBlock: 12422079
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - DelegateChanged
+        - DelegateVotesChanged
+      abis:
+        - name: GTC
+          file: GTC\abis\GTC.json
+      eventHandlers:
+        - event: DelegateChanged(indexed address,indexed address,indexed address)
+          handler: handleDelegateChanged
+        - event: DelegateVotesChanged(indexed address,uint256,uint256)
+          handler: handleDelegateVotesChanged
+      file: GTC\GTC.wasm

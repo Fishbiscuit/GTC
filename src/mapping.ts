@@ -8,78 +8,38 @@ import {
   MinterChanged,
   Transfer
 } from "../generated/GTC/GTC"
-import { ExampleEntity } from "../generated/schema"
+// imports the schema defined prior
+import { Delegate } from "../generated/schema"
 
-export function handleApproval(event: Approval): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
-
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (entity == null) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
-
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
+// ingests the event when a new delegatee is made
+export function handleDelegateChanged(event: DelegateChanged): void {
+  let id = event.params.fromDelegate.toHex()
+  let delegate = Delegate.load(id)
+  if (delegate == null){
+    delegate = new Delegate(id)
+	delegate.delegatee = event.params.toDelegate
   }
-
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
-
-  // Entity fields can be set based on event parameters
-  entity.owner = event.params.owner
-  entity.spender = event.params.spender
-
-  // Entities can be written to the store with `.save()`
-  entity.save()
-
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
-
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
-  // - contract.DELEGATION_TYPEHASH(...)
-  // - contract.DOMAIN_TYPEHASH(...)
-  // - contract.GTCDist(...)
-  // - contract.PERMIT_TYPEHASH(...)
-  // - contract.allowance(...)
-  // - contract.approve(...)
-  // - contract.balanceOf(...)
-  // - contract.checkpoints(...)
-  // - contract.decimals(...)
-  // - contract.delegates(...)
-  // - contract.getCurrentVotes(...)
-  // - contract.getPriorVotes(...)
-  // - contract.minimumTimeBetweenMints(...)
-  // - contract.mintCap(...)
-  // - contract.minter(...)
-  // - contract.mintingAllowedAfter(...)
-  // - contract.name(...)
-  // - contract.nonces(...)
-  // - contract.numCheckpoints(...)
-  // - contract.symbol(...)
-  // - contract.totalSupply(...)
-  // - contract.transfer(...)
-  // - contract.transferFrom(...)
+	delegate.delegatee = event.params.toDelegate
+	delegate.save()
 }
 
-export function handleDelegateChanged(event: DelegateChanged): void {}
+// ingests the event when the votes a delegate has is changed
+export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {
+  let id = event.params.delegate.toHex()
+  let delegate = Delegate.load(id)
+  if (delegate == null){
+    delegate = new Delegate(id)
+	delegate.delegatedAmount = event.params.previousBalance
+  }
+	delegate.delegatedAmount = event.params.newBalance
+	delegate.save()
+}
 
-export function handleDelegateVotesChanged(event: DelegateVotesChanged): void {}
+// Unused events for future work
+// export function handleApproval(event: Approval): void {}
 
-export function handleGTCDistChanged(event: GTCDistChanged): void {}
+// export function handleGTCDistChanged(event: GTCDistChanged): void {}
 
-export function handleMinterChanged(event: MinterChanged): void {}
+//export function handleMinterChanged(event: MinterChanged): void {}
 
-export function handleTransfer(event: Transfer): void {}
+// export function handleTransfer(event: Transfer): void {}
